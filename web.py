@@ -11,7 +11,7 @@ app = flask.Flask(__name__)
 def get_datastore():
     return datastore.Datastore(config.mongo_host, config.mongo_port)
 
-@app.route('/publish/')
+@app.route('/publish')
 def publish():
     try:
         filecap = flask.request.form['filecap']
@@ -26,7 +26,7 @@ def publish():
     path = d.insert({'filecap' : filecap}) + '.' + '.'.join(ext)
     return config.baseurl + flask.url_for('get', path=path)
 
-@app.route('/shorten/')
+@app.route('/shorten')
 def shorten():
     try:
         url = flask.request.form['url']
