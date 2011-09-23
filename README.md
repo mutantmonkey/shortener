@@ -1,7 +1,7 @@
 shortener
 =========
 
-A simple shortener for Tahoe-LAFS filecaps and URLs.
+A simple shortener for Tahoe-LAFS filecaps and URLs. Available under the New BSD license.
 
 Prerequisites
 -------------
