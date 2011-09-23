@@ -26,10 +26,7 @@ class Datastore(object):
     def get(self, id):
         return self.files.find_one(id)
 
-    def insert(self, uri):
-        id = self._new_id()
-        self.files.insert({
-            '_id' : id,
-            'uri' : uri,
-        })
-        return id
+    def insert(self, data):
+        data['_id'] = self._new_id()
+        self.files.insert(data)
+        return data['_id']
