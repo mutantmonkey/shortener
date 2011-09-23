@@ -1,15 +1,13 @@
-import base64
 import pymongo
-import hashlib
 import json
 import random
 
 CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
 class Datastore(object):
-    def __init__(self):
+    def __init__(self, host='localhost', port=27017):
         """Create new datastore."""
-        self.conn = pymongo.Connection()
+        self.conn = pymongo.Connection(host, port)
         self.db = self.conn.tahoe
         self.files = self.db.petnames
 

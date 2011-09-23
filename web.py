@@ -8,20 +8,23 @@ import config
 
 app = flask.Flask(__name__)
 
+def get_datastore():
+    return datastore.Datastore(config.mongo_host, config.mongo_port)
+
 @app.route('/publish')
 def publish():
     try:
-        uri = flask.request.form['uri']
+        filecap = flask.request.form['filecap']
         filename = flask.request.form['filename']
     except KeyError:
-        uri = flask.request.args.get('uri')
+        filecap = flask.request.args.get('filecap')
         filename = flask.request.args.get('filename')
-    if uri is None or len(uri) <= 0 or filename is None or len(filename) <= 0:
+    if filecap is None or len(filecap) <= 0 or filename is None or len(filename) <= 0:
         return 401
-    d = datastore.Datastore()
+    d = get_datastore()
     ext = filename.split('.')[1:]
-    path = d.insert({'uri' : uri}) + '.' + '.'.join(ext)
-    return flask.url_for('get', path=path)
+    path = d.insert({'filecap' : filecap}) + '.' + '.'.join(ext)
+    return config.baseurl + flask.url_for('get', path=path)
 
 @app.route('/shorten')
 def shorten():
@@ -31,31 +34,38 @@ def shorten():
         url = flask.request.args.get('url')
     if url is None or len(url) <= 0:
         return 401
-    d = datastore.Datastore()
+    d = get_datastore()
     path = d.insert({'url' : url})
-    return flask.url_for('get', path=path)
+    return config.baseurl + flask.url_for('get', path=path)
 
 @app.route('/<path>')
 def get(path):
     id = path.split('.')[0]
-    d = datastore.Datastore()
+    d = get_datastore()
     f = d.get(id)
+    if not f:
+        flask.abort(404)
 
-    if 'uri' in f:
+    if 'filecap' in f:
         filename = path.split('?')[0]
-        r = urllib2.urlopen('{0}/file/{1}/@@named=/{2}'.format(
-                config.tahoe_backend, f['uri'], filename))
-        headers = r.info()
-        content = r.read()
+        try:
+            r = urllib2.urlopen('{0}/file/{1}/@@named=/{2}'.format(
+                    config.tahoe_backend, f['filecap'], filename))
+            headers = r.info()
+            content = r.read()
+        except urllib2.HTTPError, e:
+            flask.abort(e.code)
 
         resp = flask.make_response(content, 200)
         resp.headers['Content-Type'] = headers['Content-Type']
         resp.headers['Content-Length'] = headers['Content-Length']
         resp.headers['Etag'] = headers['Etag']
         return resp
-    else:
+    elif 'url' in f:
         url = f['url']
         return flask.redirect(url)
+    else:
+        abort(404)
 
 if __name__ == "__main__":
     app.run(debug=True)
