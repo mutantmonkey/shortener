@@ -4,6 +4,8 @@ import re
 import flask
 import urllib2
 
+import config
+
 app = flask.Flask(__name__)
 
 @app.route('/publish')
@@ -40,13 +42,20 @@ def get(path):
     f = d.get(id)
 
     if 'uri' in f:
-        m = re.match('URI:CHK:(\S+):(\S+):(\d+):(\d+):(\d+)', f['uri'])
-        url = 'http://tahoe.vtluug.org/{0}/{1}/{2}/{3}/{4}/{5}'.format(
-                m.group(1), m.group(2), m.group(3), m.group(4), m.group(5),
-                path)
+        filename = path.split('?')[0]
+        r = urllib2.urlopen('{0}/file/{1}/@@named=/{2}'.format(
+                config.tahoe_backend, f['uri'], filename))
+        headers = r.info()
+        content = r.read()
+
+        resp = flask.make_response(content, 200)
+        resp.headers['Content-Type'] = headers['Content-Type']
+        resp.headers['Content-Length'] = headers['Content-Length']
+        resp.headers['Etag'] = headers['Etag']
+        return resp
     else:
         url = f['url']
-    return flask.redirect(url)
+        return flask.redirect(url)
 
 if __name__ == "__main__":
     app.run(debug=True)
