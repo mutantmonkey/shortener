@@ -20,6 +20,7 @@ def publish():
 
 @app.route('/<id>')
 def get(id):
+    id = id.split('.')[0]
     d = datastore.Datastore()
     f = d.get(id)
 
