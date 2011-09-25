@@ -49,20 +49,9 @@ def get(path):
     if 'filecap' in f:
         filename = path.split('?')[0]
         tahoe_url = '/file/{0}/@@named=/{1}'.format(f['filecap'], filename)
-        """try:
-            r = urllib2.urlopen('{0}{1}'.format(config.tahoe_backend,
-                tahoe_url))
-            headers = r.info()
-            content = r.read()
-        except urllib2.HTTPError, e:
-            flask.abort(e.code)
-
-        resp = flask.make_response(content, 200)
-        resp.headers['Content-Type'] = headers['Content-Type']
-        resp.headers['Content-Length'] = headers['Content-Length']
-        resp.headers['Etag'] = headers['Etag']
-        return resp"""
-        return flask.redirect(tahoe_url)
+        resp = flask.make_response(tahoe_url, 200)
+        resp.headers['X-Accel-Redirect'] = tahoe_url
+        return resp
     elif 'url' in f:
         url = f['url']
         return flask.redirect(url)
