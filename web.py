@@ -58,5 +58,18 @@ def get(path):
     else:
         abort(404)
 
+@app.route('/')
+def index():
+    return """
+<p>This is a URL shortener and Tahoe-LAFS gateway. Please direct questions,
+comments, and complaints to <a
+href='mailto:tahoe@vtluug.org'>tahoe@vtluug.org</a>.
+
+<p>Please note that the <a href='http://vtluug.org' rel='external'>Linux and
+Unix Users Group at Virginia Tech</a> have no control over the content behind
+this site, but individual URLs can be removed if you wish. Direct email to the
+address above.</p>
+"""
+
 if __name__ == "__main__":
     app.run(debug=True)
