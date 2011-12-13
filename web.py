@@ -3,6 +3,8 @@ import sys
 import re
 import flask
 import urllib2
+import urlparse
+import lxml.html
 
 import config
 
@@ -34,6 +36,32 @@ def shorten():
         url = flask.request.args.get('url')
     if url is None or len(url) <= 0:
         flask.abort(400)
+
+    purl = urlparse.urlparse(url)
+
+    # Ensure protocol is allowed
+    if not purl.scheme in config.allowed_protocols:
+        flask.abort(400)
+
+    try:
+        r = urllib2.urlopen(url)
+    except ValueError, urllib2.URLError:
+        flask.abort(400)
+
+    # Look for Link: <http://example.com>; rel=shortlink
+    shortlink = r.info().getheader('Link')
+    if shortlink:
+        shortlink = shortlink.split(';')
+        if shortlink[1].strip() == 'rel=shortlink':
+            return shortlink[0][1:-1]
+
+    # Look for <link rel='shortlink' href='http://example.com' />
+    page = lxml.html.fromstring(r.read())
+    shortlink = page.xpath('//link[@rel="shortlink"]')
+    if len(shortlink) > 0:
+        return shortlink[0].attrib['href']
+
+    # Make our own shortlink
     d = get_datastore()
     path = d.insert({'url' : url})
     return config.baseurl + flask.url_for('get', path=path)
