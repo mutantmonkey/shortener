@@ -45,7 +45,7 @@ def shorten():
 
     try:
         r = urllib2.urlopen(url)
-    except ValueError, urllib2.URLError:
+    except (ValueError, urllib2.HTTPError, urllib2.URLError):
         flask.abort(400)
 
     # Look for Link: <http://example.com>; rel=shortlink
