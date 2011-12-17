@@ -37,6 +37,7 @@ def shorten():
     if url is None or len(url) <= 0:
         flask.abort(400)
 
+    url = url.strip("\"', \t")
     purl = urlparse.urlparse(url)
 
     # Ensure protocol is allowed
@@ -60,6 +61,8 @@ def shorten():
     shortlink = page.xpath('//link[@rel="shortlink"]')
     if len(shortlink) > 0:
         return shortlink[0].attrib['href']
+
+    url = r.geturl()
 
     # Make our own shortlink
     d = get_datastore()
