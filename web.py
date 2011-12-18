@@ -85,7 +85,7 @@ def get(path):
         return resp
     elif 'url' in f:
         url = f['url']
-        return flask.redirect(url)
+        return flask.redirect(url, 301)
     else:
         abort(404)
 
