@@ -47,22 +47,24 @@ def shorten():
     try:
         r = urllib2.urlopen(url)
     except (ValueError, urllib2.HTTPError, urllib2.URLError):
-        flask.abort(400)
+        #flask.abort(400)
+        r = None
 
-    # Look for Link: <http://example.com>; rel=shortlink
-    shortlink = r.info().getheader('Link')
-    if shortlink:
-        shortlink = shortlink.split(';')
-        if shortlink[1].strip() == 'rel=shortlink':
-            return shortlink[0][1:-1]
+    if r:
+        # Look for Link: <http://example.com>; rel=shortlink
+        shortlink = r.info().getheader('Link')
+        if shortlink:
+            shortlink = shortlink.split(';')
+            if shortlink[1].strip() == 'rel=shortlink':
+                return shortlink[0][1:-1]
 
-    # Look for <link rel='shortlink' href='http://example.com' />
-    page = lxml.html.fromstring(r.read())
-    shortlink = page.xpath('//link[@rel="shortlink"]')
-    if len(shortlink) > 0:
-        return shortlink[0].attrib['href']
+        # Look for <link rel='shortlink' href='http://example.com' />
+        page = lxml.html.fromstring(r.read())
+        shortlink = page.xpath('//link[@rel="shortlink"]')
+        if len(shortlink) > 0:
+            return shortlink[0].attrib['href']
 
-    url = r.geturl()
+        url = r.geturl()
 
     # Make our own shortlink
     d = get_datastore()
