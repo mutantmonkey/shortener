@@ -1,10 +1,10 @@
 shortener
 =========
 
-A simple shortener for Tahoe-LAFS filecaps and URLs. Available under the New BSD license.
+A simple shortener for Tahoe-LAFS filecaps and URLs. Available under the ISC license.
 
 Prerequisites
 -------------
 * Python 2.7
-* Flask
+* [Flask](http://flask.pocoo.org/)
 * MongoDB and pymongo bindings
