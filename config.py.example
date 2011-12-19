@@ -2,4 +2,5 @@ mongo_host = 'localhost'
 mongo_port = 27017
 tahoe_backend = 'http://localhost:3456'
 baseurl = 'http://example.com'
+user_agent = "shortener (+https://github.com/mutantmonkey/shortener)"
 allowed_protocols = ['http', 'https']

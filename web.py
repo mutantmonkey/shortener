@@ -44,10 +44,16 @@ def shorten():
     if not purl.scheme in config.allowed_protocols:
         flask.abort(400)
 
+    req = urllib2.Request(url)
+    req.add_header('User-agent', config.user_agent)
+
     try:
-        r = urllib2.urlopen(url)
-    except (ValueError, urllib2.HTTPError, urllib2.URLError):
-        #flask.abort(400)
+        r = urllib2.urlopen(req)
+    except (ValueError, urllib2.URLError):
+        flask.abort(400)
+    except urllib2.HTTPError as e:
+        if e.code == 404:
+            flask.abort(400)
         r = None
 
     if r:
