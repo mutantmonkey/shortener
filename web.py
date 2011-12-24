@@ -51,10 +51,10 @@ def shorten():
         r = urllib2.urlopen(req)
     except (ValueError, urllib2.URLError):
         flask.abort(400)
-    except urllib2.HTTPError as e:
-        if e.code == 404:
-            flask.abort(400)
-        r = None
+    #except urllib2.HTTPError as e:
+    #    if e.code == 404:
+    #        flask.abort(400)
+    #    r = None
 
     if r:
         # Look for Link: <http://example.com>; rel=shortlink
@@ -67,6 +67,11 @@ def shorten():
         # Look for <link rel='shortlink' href='http://example.com' />
         page = lxml.html.fromstring(r.read())
         shortlink = page.xpath('//link[@rel="shortlink"]')
+        if len(shortlink) > 0:
+            return shortlink[0].attrib['href']
+
+        # Some sites still use rel='shorturl'
+        shortlink = page.xpath('//link[@rel="shorturl"]')
         if len(shortlink) > 0:
             return shortlink[0].attrib['href']
 
