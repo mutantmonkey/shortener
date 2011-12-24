@@ -70,11 +70,6 @@ def shorten():
         if len(shortlink) > 0:
             return shortlink[0].attrib['href']
 
-        # Some sites still use rel='shorturl'
-        shortlink = page.xpath('//link[@rel="shorturl"]')
-        if len(shortlink) > 0:
-            return shortlink[0].attrib['href']
-
         url = r.geturl()
 
     # Make our own shortlink
