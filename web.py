@@ -10,8 +10,10 @@ import config
 
 app = flask.Flask(__name__)
 
+
 def get_datastore():
     return datastore.Datastore(config.mongo_host, config.mongo_port)
+
 
 @app.route('/publish', methods=['GET', 'POST'])
 def publish():
@@ -21,12 +23,14 @@ def publish():
     except KeyError:
         filecap = flask.request.args.get('filecap')
         filename = flask.request.args.get('filename')
-    if filecap is None or len(filecap) <= 0 or filename is None or len(filename) <= 0:
+    if filecap is None or len(filecap) <= 0 or filename is None or \
+            len(filename) <= 0:
         flask.abort(400)
     d = get_datastore()
     ext = filename.split('.')[1:]
-    path = d.insert({'filecap' : filecap}) + '.' + '.'.join(ext)
+    path = d.insert({'filecap': filecap}) + '.' + '.'.join(ext)
     return config.baseurl + flask.url_for('get', path=path)
+
 
 @app.route('/shorten', methods=['GET', 'POST'])
 def shorten():
@@ -74,8 +78,9 @@ def shorten():
 
     # Make our own shortlink
     d = get_datastore()
-    path = d.insert({'url' : url})
+    path = d.insert({'url': url})
     return config.baseurl + flask.url_for('get', path=path)
+
 
 @app.route('/<path>')
 def get(path):
@@ -96,6 +101,7 @@ def get(path):
         return flask.redirect(url, 301)
     else:
         abort(404)
+
 
 @app.route('/')
 def index():

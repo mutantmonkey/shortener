@@ -4,6 +4,7 @@ import random
 
 CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
+
 class Datastore(object):
     def __init__(self, host='localhost', port=27017):
         """Create new datastore."""
